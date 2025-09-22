@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import requests
 
 
@@ -7,22 +7,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    form_html = """
-    <h1>Random Facts App</h1>
-    <form action="/fact" method="get">
-        <label>Enter your name:</label>
-        <input type="text" name="username">
-        <br><br>
-        <label>Choose fact type:</label>
-        <select name="type">
-            <option value="joke">Joke</option>
-            <option value="number">Number Fact</option>
-        </select>
-        <br><br>
-        <button type="submit">Get Fact</button>
-    </form>
-    """
-    return form_html
+    return "<h1>Welcome to my Flask API server!</h1>"
 
 
 @app.route("/fact")
@@ -77,6 +62,23 @@ def number():
 
     html_content = f"<h1>Number Fact</h1><p>{fact}</p><a href='/'>Back</a>"
     return html_content
+
+
+
+@app.route("/api/joke")
+def api_joke():
+    url = "https://official-joke-api.appspot.com/random_joke"
+    response = requests.get(url)
+    data = response.json()
+    return jsonify(data)
+
+
+@app.route("/api/number")
+def api_number():
+    num = request.args.get("num", "42")
+    url = f"http://numbersapi.com/{num}/trivia"
+    response = requests.get(url)
+    return jsonify({"number": num, "fact": response.text})
 
 
 if __name__ == "__main__":
